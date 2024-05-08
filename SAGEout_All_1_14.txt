@@ -1,8 +1,4 @@
-gap> gap> 0
-gap> 0
-gap> 0
-gap> 0
-gap> gap> > > > > > > > ------ RANK 1 ---------
+------ RANK 1 ---------
 Number of Good Cases: 1
 Number of Nikulin Cases: 0
 Number of Discarded Cases: 0
