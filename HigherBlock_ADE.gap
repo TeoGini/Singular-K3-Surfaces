@@ -149,15 +149,19 @@ if A=4  then
     R:=rec(Block:=[1/2,1/2,0,0], Blocktype:=[A,2], BlockNumber:=b, BlockLength:=2);
 fi;
 
-if (A mod 2) =1   then
+if A=5  then
+    R:=rec(Block:=[1/4,3/4,1/2,0,1/2], Blocktype:=[A,2], BlockNumber:=b, BlockLength:=2);
+fi;
+
+if (A mod 2) =0 and A > 5  then
     v:=ListWithIdenticalEntries(A,0);
     v[1]:=1/2;
     v[2]:=1/2;
     R:=rec(Block:=v, Blocktype:=[A,2], BlockNumber:=b, BlockLength:=2);
 fi;
 
-if (A mod 2) =0 and A > 5   then
-    R:=rec(Block:=AddZero19([1/2,1/2,0,1/4,2/4,3/4],A), Blocktype:=[A,2], BlockNumber:=b, BlockLength:=2);
+if (A mod 2) =1 and A > 5   then
+    R:=rec(Block:=AddZero19([1/4,3/4,1/2,0,1/2,0,1/2],A), Blocktype:=[A,2], BlockNumber:=b, BlockLength:=2);
 fi;
 
 return R;
@@ -254,10 +258,10 @@ I_Blk_Vect_High:=function(TotV)
 #   SingTypeD := [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
 #   SingTypeE := [ 0, 0, 0 ],
 # );
-#  blks:=AttachBlocks(Dato);
+#  blks:=AttachBlocks_HighZ4(Dato);
 # rk:=TheRank(Dato);
 # TotV:=TotalVector(blks);
-#  v:=I_Blk_Vect(TotV);
+#  v:=I_Blk_Vect_High(TotV);
 # [ [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ] ]
 # 
 #***************************
@@ -268,12 +272,14 @@ count_two:=0;
 blksVect:=[[]];
 
 for v in TotV do 
+        #Print(count_one, "\n");
+        #Print(count_two, "\n");
 	    if Sum(v)*2 mod 3 = 0 then
     	    blksVectCopy:=ShallowCopy(blksVect);
 		    Add(blksVectCopy,v);
    		    if Sum(Sum(blksVectCopy)) <= 7 and count_two < 5 then
 			    Add(blksVect,v);
-                count_two:=count_two+Sum(v)/2;
+                count_two:=count_two+1;
 		    else
 			    Add(blksVect, Zero(v));
 		    fi;
@@ -281,11 +287,14 @@ for v in TotV do
             blksVectCopy:=ShallowCopy(blksVect);
 	        Add(blksVectCopy,v);
             #Print(count_one, "\n");
-   		    if Sum(Sum(blksVectCopy)) <= 7 and count_one < 1 then
+   		    if Sum(Sum(blksVectCopy)) <= 7 and count_one < 2 then
 			    Add(blksVect,v);
-                count_one:=count_one+Sum(v);
+                count_one:=count_one+Sum(v)/2;
                 if Sum(v) = 5/2 then
                     count_two:=count_two+2;
+                fi;
+                if Sum(v) =2 then 
+                    count_two:=count_two+1;
                 fi;
 		    else
 			    Add(blksVect, Zero(v));
@@ -441,65 +450,66 @@ end;
 
 #***************************
 AttachBlocks_HighZ5:=function(l)
-#***************************
+    #***************************
 
-local F,G,T;
+    local F,G,T;
 
-F:=AllBlocksAi_HighZ5(l.SingTypeA);
-#Print(F, "\,");
-G:=AllBlocksDi_HighZ5(l.SingTypeD);
-#Print(F, "\,");
-T:=AllBlocksEi_HighZ5(l.SingTypeE);
-Append(F,G);
-Append(F,T);
-return F;
+    F:=AllBlocksAi_HighZ5(l.SingTypeA);
+    #Print(F, "\,");
+    G:=AllBlocksDi_HighZ5(l.SingTypeD);
+    #Print(F, "\,");
+    T:=AllBlocksEi_HighZ5(l.SingTypeE);
+    Append(F,G);
+    Append(F,T);
+    return F;
 end;
-
+#---------------------------------------
 
 #---------------------------------------
 I_Blk_Vect_High5:=function(TotV)
-#***************************
-# 
-# given a block and the rank of the lattice in the form of TotalVector
-# it returns an even block vector of length rk with 8 entries
-# of value 1/2 divided into blocks.
-# 
-# WARNINGS!!
-# It reverse the order of the block starting from the biggest to
-# the smaller.
-# 
-#  EXAMPLE
-# Dato:=rec(
-#   SingTypeA := [ 8, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-#   SingTypeD := [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-#   SingTypeE := [ 0, 0, 0 ],
-# );
-#  blks:=AttachBlocks(Dato);
-# rk:=TheRank(Dato);
-# TotV:=TotalVector(blks);
-#  v:=I_Blk_Vect(TotV);
-# [ [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ] ]
-# 
-#***************************
-local blksVect,v,blksVectCopy;
+    #***************************
+    # 
+    # given a block and the rank of the lattice in the form of TotalVector
+    # it returns an even block vector of length rk with 8 entries
+    # of value 1/2 divided into blocks.
+    # 
+    # WARNINGS!!
+    # It reverse the order of the block starting from the biggest to
+    # the smaller.
+    # 
+    #  EXAMPLE
+    # Dato:=rec(
+    #   SingTypeA := [ 8, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    #   SingTypeD := [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    #   SingTypeE := [ 0, 0, 0 ],
+    # );
+    #  blks:=AttachBlocks(Dato);
+    # rk:=TheRank(Dato);
+    # TotV:=TotalVector(blks);
+    #  v:=I_Blk_Vect(TotV);
+    # [ [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ] ]
+    # 
+    #***************************
+    local blksVect,v,blksVectCopy;
 
 
-blksVect:=[[]];
-for v in TotV do 
-			blksVectCopy:=ShallowCopy(blksVect);
-			Add(blksVectCopy,v);
-            #Print(Sum(Sum(blksVectCopy)), " ", v, "\n");
-   			 if Sum(Sum(blksVectCopy)) <= 8 then
-				Add(blksVect,v);
-			else
-				Add(blksVect, Zero(v));
-			fi;
-od;
+    blksVect:=[[]];
+    for v in TotV do 
+                blksVectCopy:=ShallowCopy(blksVect);
+                Add(blksVectCopy,v);
+                #Print(Sum(Sum(blksVectCopy)), " ", v, "\n");
+                if Sum(Sum(blksVectCopy)) <= 8 then
+                    Add(blksVect,v);
+                else
+                    Add(blksVect, Zero(v));
+                fi;
+    od;
 
-Remove(blksVect,1);
+    Remove(blksVect,1);
 
-return blksVect;
+    return blksVect;
 end;
+#---------------------------------------
 
 #############################################################
 #############################################################
@@ -509,192 +519,188 @@ end;
 ############################################################
 #***************************
 BlockA_i_HighZ7:=function(a,b)
-#------------------------------
-#
-#Given a:=position of SingAi and b:=value of SingAi[a]
-#it returns a record with
-# blockAi for the new basis vector
-# the type of the block 
-# how many blocks we have of this type
-# how many 1/2 it gives
-#
-#------------------------------
-local i,v,bl,y, R;
+    #------------------------------
+    #
+    #Given a:=position of SingAi and b:=value of SingAi[a]
+    #it returns a record with
+    # blockAi for the new basis vector
+    # the type of the block 
+    # how many blocks we have of this type
+    # how many 1/2 it gives
+    #
+    #------------------------------
+    local i,v,bl,y, R;
 
 
-y:=0;
-v:=[];
-bl:=[];
+    y:=0;
+    v:=[];
+    bl:=[];
 
 
 
-if a <> 6 then
-	R:=rec(Block:=ListWithIdenticalEntries(a,0), Blocktype:=[a,1], BlockNumber:=b, BlockLength:=y);
-fi;
+    if a <> 6 then
+        R:=rec(Block:=ListWithIdenticalEntries(a,0), Blocktype:=[a,1], BlockNumber:=b, BlockLength:=y);
+    fi;
 
 
-if a = 6  then
-	R:=rec(Block:=[1/7,2/7,3/7,4/7,5/7,6/7], Blocktype:=[a,1], BlockNumber:=b, BlockLength:=6);
-fi;
+    if a = 6  then
+        R:=rec(Block:=[1/7,2/7,3/7,4/7,5/7,6/7], Blocktype:=[a,1], BlockNumber:=b, BlockLength:=6);
+    fi;
 
 
-return R;
+    return R;
 end; 
 #***************************
 
 #***************************
 AllBlocksAi_HighZ7:=function(l)
-#***************************
+    #***************************
 
-local i, List, count_to_4;
+    local i, List, count_to_4;
 
-List:=[];
+    List:=[];
 
-for i in [1..Length(l)] do
-    Add(List, BlockA_i_HighZ7(i, l[i]));
-od;
-return List;
+    for i in [1..Length(l)] do
+        Add(List, BlockA_i_HighZ7(i, l[i]));
+    od;
+    return List;
 end;
-
-
 #***************************
 
 #***************************
 BlockD_i_HighZ7:=function(a,b)
-#------------------------------
-#
-#Given a:=position of SingDi and b:=value of SingDi[a]
-#it returns a record with
-# blockDi for the new basis vector
-# the type of the block 
-# how many blocks we have of this type
-# how many 1/2 it gives
-#
-#------------------------------
-local i,v,R,y,A,T;
+    #------------------------------
+    #
+    #Given a:=position of SingDi and b:=value of SingDi[a]
+    #it returns a record with
+    # blockDi for the new basis vector
+    # the type of the block 
+    # how many blocks we have of this type
+    # how many 1/2 it gives
+    #
+    #------------------------------
+    local i,v,R,y,A,T;
 
-y:=0;
-A:=a+3;
-R:=rec(Block:=ListWithIdenticalEntries(A,0), Blocktype:=[A,2], BlockNumber:=b, BlockLength:=y);
+    y:=0;
+    A:=a+3;
+    R:=rec(Block:=ListWithIdenticalEntries(A,0), Blocktype:=[A,2], BlockNumber:=b, BlockLength:=y);
 
 
-return R;
+    return R;
 end;
 #***************************
 
-
 #***************************
 AllBlocksDi_HighZ7:=function(l)
-#***************************
-local i, List;
+    #***************************
+    local i, List;
 
-List:=[];
-for i in [1..Length(l)] do
-	Add(List, BlockD_i_HighZ7(i, l[i]));
-od;
-return List;
+    List:=[];
+    for i in [1..Length(l)] do
+        Add(List, BlockD_i_HighZ7(i, l[i]));
+    od;
+    return List;
 end;
 #***************************
 
 #***************************
 BlockE_i_HighZ7:=function(a,b)
-#------------------------------
-#
-#Given a:=position of SingEi and b:=value of SingEi[a]
-#it returns a record with
-# blockDi for the new basis vector
-# the type of the block 
-# how many blocks we have of this type
-# how many 1/2 it gives
-#
-#------------------------------
-local i,v,R,y,A;
+    #------------------------------
+    #
+    #Given a:=position of SingEi and b:=value of SingEi[a]
+    #it returns a record with
+    # blockDi for the new basis vector
+    # the type of the block 
+    # how many blocks we have of this type
+    # how many 1/2 it gives
+    #
+    #------------------------------
+    local i,v,R,y,A;
 
-y:=0;
-A:=a+5;
-R:=rec(Block:=ListWithIdenticalEntries(A,0), Blocktype:=[A,3], BlockNumber:=b, BlockLength:=y);
+    y:=0;
+    A:=a+5;
+    R:=rec(Block:=ListWithIdenticalEntries(A,0), Blocktype:=[A,3], BlockNumber:=b, BlockLength:=y);
 
-#if A=6 and b>0 then
-#R:=rec(Block:=[1/3,2/3,0,1/3,2/3,0], Blocktype:=[A,3], BlockNumber:=b, BlockLength:=3);
-#fi;
+    #if A=6 and b>0 then
+    #R:=rec(Block:=[1/3,2/3,0,1/3,2/3,0], Blocktype:=[A,3], BlockNumber:=b, BlockLength:=3);
+    #fi;
 
-return R;
+    return R;
 end;
 #***************************
-
-
 
 #***************************
 AllBlocksEi_HighZ7:=function(l)
 
-local i, List;
+    local i, List;
 
-List:=[];
-for i in [1..Length(l)] do
-	Add(List, BlockE_i_HighZ7(i, l[i]));
-od;
-return List;
+    List:=[];
+    for i in [1..Length(l)] do
+        Add(List, BlockE_i_HighZ7(i, l[i]));
+    od;
+    return List;
 end;
 #***************************
 
 #***************************
 AttachBlocks_HighZ7:=function(l)
-#***************************
+    #***************************
 
-local F,G,T;
+    local F,G,T;
 
-F:=AllBlocksAi_HighZ7(l.SingTypeA);
-#Print(F, "\,");
-G:=AllBlocksDi_HighZ7(l.SingTypeD);
-#Print(F, "\,");
-T:=AllBlocksEi_HighZ7(l.SingTypeE);
-Append(F,G);
-Append(F,T);
-return F;
+    F:=AllBlocksAi_HighZ7(l.SingTypeA);
+    #Print(F, "\,");
+    G:=AllBlocksDi_HighZ7(l.SingTypeD);
+    #Print(F, "\,");
+    T:=AllBlocksEi_HighZ7(l.SingTypeE);
+    Append(F,G);
+    Append(F,T);
+    return F;
 end;
-
+#---------------------------------------
 
 #---------------------------------------
 I_Blk_Vect_High7:=function(TotV)
-#***************************
-# 
-# given a block and the rank of the lattice in the form of TotalVector
-# it returns an even block vector of length rk with 8 entries
-# of value 1/2 divided into blocks.
-# 
-# WARNINGS!!
-# It reverse the order of the block starting from the biggest to
-# the smaller.
-# 
-#  EXAMPLE
-# Dato:=rec(
-#   SingTypeA := [ 8, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-#   SingTypeD := [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
-#   SingTypeE := [ 0, 0, 0 ],
-# );
-#  blks:=AttachBlocks(Dato);
-# rk:=TheRank(Dato);
-# TotV:=TotalVector(blks);
-#  v:=I_Blk_Vect(TotV);
-# [ [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ] ]
-# 
-#***************************
-local blksVect,v,blksVectCopy;
+    #***************************
+    # 
+    # given a block and the rank of the lattice in the form of TotalVector
+    # it returns an even block vector of length rk with 8 entries
+    # of value 1/2 divided into blocks.
+    # 
+    # WARNINGS!!
+    # It reverse the order of the block starting from the biggest to
+    # the smaller.
+    # 
+    #  EXAMPLE
+    # Dato:=rec(
+    #   SingTypeA := [ 8, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    #   SingTypeD := [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+    #   SingTypeE := [ 0, 0, 0 ],
+    # );
+    #  blks:=AttachBlocks(Dato);
+    # rk:=TheRank(Dato);
+    # TotV:=TotalVector(blks);
+    #  v:=I_Blk_Vect(TotV);
+    # [ [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 0, 0 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ], [ 1/2 ] ]
+    # 
+    #***************************
+    local blksVect,v,blksVectCopy;
 
 
-blksVect:=[[]];
-for v in TotV do 
-			blksVectCopy:=ShallowCopy(blksVect);
-			Add(blksVectCopy,v);
-            #Print(Sum(Sum(blksVectCopy)), " ", v, "\n");
-   			 if Sum(Sum(blksVectCopy)) <= 9 then
-				Add(blksVect,v);
-			else
-				Add(blksVect, Zero(v));
-			fi;
-od;
+    blksVect:=[[]];
+    for v in TotV do 
+                blksVectCopy:=ShallowCopy(blksVect);
+                Add(blksVectCopy,v);
+                #Print(Sum(Sum(blksVectCopy)), " ", v, "\n");
+                if Sum(Sum(blksVectCopy)) <= 9 then
+                    Add(blksVect,v);
+                else
+                    Add(blksVect, Zero(v));
+                fi;
+    od;
 
-Remove(blksVect,1);
+    Remove(blksVect,1);
 
-return blksVect;
+    return blksVect;
 end;
+#---------------------------------------
