@@ -21,15 +21,6 @@ Read("HigherBlock_ADE.gap");
 
 
 
-#------------------------------------------------------------------
-#
-# COSE DA RIVEDERE/FARE: 12/04/24
-# 1) Il vettore W2 è quasi dsempre sbegliato
-# 2) Rivedere il caso con 3A1+2A3+2A5
-# 3) Aggiungere i vettori higher divisible
-#
-#------------------------------------------------------------------
-
 
 
 #**************************************************
